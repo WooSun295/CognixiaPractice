@@ -34,42 +34,42 @@ MOCK_BANKS = [
 
 MOCK_ACCOUNTS = [
     {
-        "accountId": 100011,
+        "id": 100011,
         "userId": 10001,
         "bankId": 1,
         "balance": 100000,
         "type": "Checking"
     },
     {
-        "accountId": 100012,
+        "id": 100012,
         "userId": 10001,
         "bankId": 1,
         "balance": 200000,
         "type": "Savings"
     },
     {
-        "accountId": 100021,
+        "id": 100021,
         "userId": 10002,
         "bankId": 2,
         "balance": 300000,
         "type": "Checking"
     },
     {
-        "accountId": 100022,
+        "id": 100022,
         "userId": 10002,
         "bankId": 2,
         "balance": 400000,
         "type": "Savings"
     },
     {
-        "accountId": 100031,
+        "id": 100031,
         "userId": 10003,
         "bankId": 1,
         "balance": 500000,
         "type": "Checking"
     },
     {
-        "accountId": 100032,
+        "id": 100032,
         "userId": 10003,
         "bankId": 2,
         "balance": 600000,

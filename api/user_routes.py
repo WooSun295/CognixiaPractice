@@ -4,10 +4,9 @@ from fastapi.responses import JSONResponse
 from services.user_services import *
 from models.user import User
 
-router = APIRouter()
-BASE_URL = "/api/v1"
+userRouter = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
-@router.get(BASE_URL + "/users")
+@userRouter.get("/")
 def get_users():
 
     users = getUsers()
@@ -17,7 +16,7 @@ def get_users():
         content=users
     )
 
-@router.get(BASE_URL + "/users/{user_id}")
+@userRouter.get("/{user_id}")
 def get_user(user_id: int):
 
     user = getUser(user_id)
@@ -33,7 +32,7 @@ def get_user(user_id: int):
         content=user
     )
 
-@router.post(BASE_URL + "/users")
+@userRouter.post("/")
 def create_user(user: User):
     new_user = createUser(
         user.username, user.password
@@ -44,7 +43,7 @@ def create_user(user: User):
         content=new_user
     )
 
-@router.post(BASE_URL + "/users/{user_id}")
+@userRouter.put("/{user_id}")
 def update_user(user_id: int, user: User):
     updated = updateUser(
         user_id, user.username, user.password
@@ -60,16 +59,15 @@ def update_user(user_id: int, user: User):
         content=updated
     )
 
-@router.delete(BASE_URL + "/users/{user_id}")
+@userRouter.delete("/{user_id}")
 def delete_user(user_id: int):
     deleted = deleteUser(user_id)
 
-    if not deleted:
+    if deleted is None:
         return JSONResponse(
             status_code=404,
             content={"message": "User not found"}
         )
     return JSONResponse(
-        status_code=200,
-        content={"message": "User deleted"}
+        status_code=204
     )
