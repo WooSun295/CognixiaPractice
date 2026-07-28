@@ -1,34 +1,17 @@
-MOCK_USERS = [
+MOCK_TXNS = [
     {
         "id": 1,
-        "username": "admin",
-        "password": "admin123"
+        "accountId": 100011,
+        "txn_type": "withdraw",
+        "amount": 99.99,
+        "createdAt": "2026-07-28 14:50:53"
     },
-    {
-        "id": 10001,
-        "username": "user1",
-        "password": "user123"
-    },
-    {
-        "id": 10002,
-        "username": "user2",
-        "password": "user123"
-    },
-    {
-        "id": 10003,
-        "username": "user3",
-        "password": "user123"
-    },
-]
-
-MOCK_BANKS = [
     {
         "id": 1,
-        "name": "ABC World Bank"
-    },
-    {
-        "id": 2,
-        "name": "123 National Bank"
+        "accountId": 100022,
+        "txn_type": "deposit",
+        "amount": 99.99,
+        "createdAt": "2026-07-28 14:50:53"
     }
 ]
 

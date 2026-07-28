@@ -1,42 +1,40 @@
-from api.dummy_data import MOCK_USERS
+from bson import ObjectId
+from helpers.helper import created_at
+from database.database import client
+
+db = client["simple_bank_db"]
+
+users_col = db["Users"]
 
 def getUsers():
-    return MOCK_USERS
+    res = list(users_col.find())
+    for r in res:
+        r["_id"] = str(r["_id"])
 
-def getUser(user_id: int):
-    for user in MOCK_USERS:
-        if user["id"] == user_id:
-            return user
-    return None
+    return res
 
-def createUser(username: str, password: str):
-    new_user = {
-        "id": len(MOCK_USERS) + 10000,
-        "username": username,
-        "password": password
-    }
+def getUser(user_id: str):
+    res = users_col.find_one({"_id": ObjectId(user_id)})
+    if res:
+        res["_id"] = str(res["_id"])
 
-    MOCK_USERS.append(new_user)
+    return res
 
-    return new_user
+def createUser(name: str, password: str, email: str):
+    return users_col.insert_one({
+        "name": name,
+        "password": password,
+        "email": email,
+        "createdAt": created_at()
+    })
 
-def updateUser(user_id: int, username: str, password: str):
-    user = getUser(user_id)
+def updateUser(user_id: str, name: str, password: str, email: str):
+    return users_col.update_one(
+        {"_id": ObjectId(user_id)},
+        { "$set": {"name": name},
+         "$set": {"password": password}, 
+         "$set": {"email": email}}
+    )
 
-    if user is None:
-        return None
-
-    user["username"] = username
-    user["password"] = password
-
-    return user
-
-def deleteUser(user_id: int):
-    user = getUser(user_id)
-
-    if user is None:
-        return None
-
-    MOCK_USERS.remove(user)
-
-    return True
+def deleteUser(user_id: str):
+    return users_col.delete_one({"_id": ObjectId(user_id)})

@@ -2,9 +2,9 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from services.account_services import *
-from models.account import Account, Order
+from models.account import Account
 
-accountRouter = APIRouter(prefix="/api/v1/accounts", tags=["Accounts"])
+accountRouter = APIRouter(prefix="/api/v2/accounts", tags=["Accounts"])
 
 @accountRouter.get("/")
 def get_accounts():
@@ -20,22 +20,6 @@ def get_accounts():
 def get_user_accounts(user_id: int):
 
     accounts = getAccounts("user", user_id)
-
-    if accounts is None:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Accounts not found"}
-        )
-
-    return JSONResponse(
-        status_code=200,
-        content=accounts
-    )
-
-@accountRouter.get("/banks/{bank_id}")
-def get_bank_accounts(bank_id: int):
-
-    accounts = getAccounts("bank", bank_id)
 
     if accounts is None:
         return JSONResponse(
@@ -75,52 +59,16 @@ def create_bank(account: Account):
         content=new_account
     )
 
-@accountRouter.patch("/{account_id}/deposit")
-def deposit_account(account_id: int, order: Order):
+@accountRouter.put("/{account_id}")
+def update_account(account_id: int, account: Account):
     updated = updateAccount(
-        account_id, order.amount, "deposit"
+        account_id, account.balance, account.type
     )
 
     if updated is None:
         return JSONResponse(
             status_code=404,
             content={"message": "Account not found"}
-        )
-    elif updated == -1:
-        return JSONResponse(
-            status_code=400,
-            content={"message": "Insufficient amount"}
-        )
-    elif not updated:
-        return JSONResponse(
-            status_code=400,
-            content={"message": "Bad Request"}
-        )
-    return JSONResponse(
-        status_code=200,
-        content=updated
-    )
-
-@accountRouter.patch("/{account_id}/withdraw")
-def withdraw_account(account_id: int, order: Order):
-    updated = updateAccount(
-        account_id, order.amount, "withdraw"
-    )
-
-    if updated is None:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Account not found"}
-        )
-    elif updated == -1:
-        return JSONResponse(
-            status_code=400,
-            content={"message": "Insufficient amount"}
-        )
-    elif not updated:
-        return JSONResponse(
-            status_code=400,
-            content={"message": "Bad Request"}
         )
     
     return JSONResponse(

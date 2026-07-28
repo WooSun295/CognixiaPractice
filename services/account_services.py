@@ -1,4 +1,5 @@
 from api.dummy_data import MOCK_ACCOUNTS
+from helpers.helper import created_at
 
 def getAccounts(category: str = "", category_id: int = 0):
     if not category:
@@ -10,12 +11,7 @@ def getAccounts(category: str = "", category_id: int = 0):
                 if account["userId"] == category_id:
                     res.append(account)
             return res
-        elif category == "bank":
-            res = []
-            for account in MOCK_ACCOUNTS:
-                if account["bankId"] == category_id:
-                    res.append(account)
-            return res
+        
     return None
 
 def getAccount(account_id: int):
@@ -24,34 +20,26 @@ def getAccount(account_id: int):
             return account
     return None
 
-def createAccount(userId: int, bankId: int, balance: int, type: str):
+def createAccount(userId: int, balance: float, type: str):
     new_account = {
-        "id": int(str(userId) + str(bankId)),
         "userId": userId,
-        "bankId": bankId,
         "balance": balance,
-        "type": type
+        "type": type,
+        "createdAt": created_at()
     }
 
     MOCK_ACCOUNTS.append(new_account)
 
     return new_account
 
-def updateAccount(account_id: int, amount: int, type: str):
+def updateAccount(account_id: int, balance: int, type: str):
     account = getAccount(account_id)
 
     if account is None:
         return None
 
-    if type == "deposit":
-        account["balance"] += amount
-    elif type == "withdraw":
-        if account["balance"] >= amount:
-            account["balance"] -= amount
-        else:
-            return -1
-    else:
-        return False
+    account["balance"] = balance
+    account["type"] = type
 
     return account
 
