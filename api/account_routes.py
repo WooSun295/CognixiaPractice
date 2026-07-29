@@ -16,24 +16,8 @@ def get_accounts():
         content=accounts
     )
 
-@accountRouter.get("/users/{user_id}")
-def get_user_accounts(user_id: int):
-
-    accounts = getAccounts("user", user_id)
-
-    if accounts is None:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Accounts not found"}
-        )
-
-    return JSONResponse(
-        status_code=200,
-        content=accounts
-    )
-
 @accountRouter.get("/{account_id}")
-def get_account(account_id: int):
+def get_account(account_id: str):
 
     account = getAccount(account_id)
 
@@ -49,43 +33,51 @@ def get_account(account_id: int):
     )
 
 @accountRouter.post("/")
-def create_bank(account: Account):
+def create_account(account: Account):
     new_account = createAccount(
-        account.userId, account.bankId, account.balance, account.type
+        account.userId, account.balance, account.type
     )
 
     return JSONResponse(
-        status_code=201,
-        content=new_account
+        status_code=200,
+        content={
+            "acknowledged": new_account.acknowledged,
+            "insertedId": str(new_account.inserted_id)
+        }
     )
 
 @accountRouter.put("/{account_id}")
-def update_account(account_id: int, account: Account):
+def update_account(account_id: str, account: Account):
     updated = updateAccount(
         account_id, account.balance, account.type
     )
 
-    if updated is None:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Account not found"}
-        )
-    
+    if updated.matched_count == 0:
+            return JSONResponse(
+                status_code=404,
+                content={"message": "Account not found"}
+            )
     return JSONResponse(
         status_code=200,
-        content=updated
+        content={
+            "acknowledged": updated.acknowledged,
+            "updatedId": account_id,
+        }
     )
 
 @accountRouter.delete("/{account_id}")
-def delete_account(account_id: int):
+def delete_account(account_id: str):
     deleted = deleteAccount(account_id)
 
-    if deleted is None:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Account not found"}
-        )
+    if deleted.deleted_count == 0:
+            return JSONResponse(
+                status_code=404,
+                content={"message": "Account not found"}
+            )
     return JSONResponse(
         status_code=200,
-        content={"message": "Account Deleted"}
+        content={
+            "acknowledged": deleted.acknowledged,
+            "deleted_count": deleted.deleted_count
+        }
     )

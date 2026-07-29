@@ -20,6 +20,36 @@ def getUser(user_id: str):
 
     return res
 
+def getUserAcc(user_id: str):
+    res = next(users_col.aggregate([
+        {
+            "$match": {
+                "_id": ObjectId(user_id)
+            },
+        },
+        {
+            "$lookup": {
+                "from": "Accounts",
+                "localField": "_id",
+                "foreignField": "userId",
+                "as": "accounts"
+            }
+        },
+        {
+            "$project": {
+                "password": 0
+            }
+        }
+    ]), None)
+
+    if res:
+        res["_id"] = str(res["_id"])
+        for a in res["accounts"]:
+            a["_id"] = str(a["_id"])
+            a["userId"] = str(a["userId"])
+
+    return res
+
 def createUser(name: str, password: str, email: str):
     return users_col.insert_one({
         "name": name,
@@ -31,9 +61,7 @@ def createUser(name: str, password: str, email: str):
 def updateUser(user_id: str, name: str, password: str, email: str):
     return users_col.update_one(
         {"_id": ObjectId(user_id)},
-        { "$set": {"name": name},
-         "$set": {"password": password}, 
-         "$set": {"email": email}}
+        { "$set": {"name": name, "password": password, "email": email}}
     )
 
 def deleteUser(user_id: str):

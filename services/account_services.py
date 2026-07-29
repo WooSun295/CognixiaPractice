@@ -1,54 +1,40 @@
-from api.dummy_data import MOCK_ACCOUNTS
+from bson import ObjectId
 from helpers.helper import created_at
+from database.database import client
 
-def getAccounts(category: str = "", category_id: int = 0):
-    if not category:
-        return MOCK_ACCOUNTS
-    else:
-        if category == "user":
-            res = []
-            for account in MOCK_ACCOUNTS:
-                if account["userId"] == category_id:
-                    res.append(account)
-            return res
-        
-    return None
+db = client["simple_bank_db"]
 
-def getAccount(account_id: int):
-    for account in MOCK_ACCOUNTS:
-        if account["id"] == account_id:
-            return account
-    return None
+acc_col = db["Accounts"]
 
-def createAccount(userId: int, balance: float, type: str):
-    new_account = {
-        "userId": userId,
-        "balance": balance,
-        "type": type,
-        "createdAt": created_at()
-    }
+def getAccounts():
+    res = list(acc_col.find())
+    for r in res:
+        r["_id"] = str(r["_id"])
+        r["userId"] = str(r["userId"])
 
-    MOCK_ACCOUNTS.append(new_account)
+    return res
+    
+def getAccount(account_id: str):
+    res = acc_col.find_one({"_id": ObjectId(account_id)})
+    if res:
+        res["_id"] = str(res["_id"])
+        res["userId"] = str(res["userId"])
 
-    return new_account
+    return res
 
-def updateAccount(account_id: int, balance: int, type: str):
-    account = getAccount(account_id)
+def createAccount(userId: str, balance: float, type: str):
+    return acc_col.insert_one({
+            "userId": ObjectId(userId),
+            "balance": balance,
+            "accountType": type,
+            "createdAt": created_at()
+        })
 
-    if account is None:
-        return None
+def updateAccount(account_id: str, balance: int, type: str):
+    return acc_col.update_one(
+        {"_id": ObjectId(account_id)},
+        { "$set": {"balance": balance, "accountType": type}}
+    )
 
-    account["balance"] = balance
-    account["type"] = type
-
-    return account
-
-def deleteAccount(account_id: int):
-    account = getAccount(account_id)
-
-    if account is None:
-        return None
-
-    MOCK_ACCOUNTS.remove(account)
-
-    return True
+def deleteAccount(account_id: str):
+    return acc_col.delete_one({"_id": ObjectId(account_id)})

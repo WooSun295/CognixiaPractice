@@ -18,7 +18,6 @@ def get_users():
 
 @userRouter.get("/{user_id}")
 def get_user(user_id: str):
-
     user = getUser(user_id)
 
     if not user:
@@ -32,6 +31,21 @@ def get_user(user_id: str):
         content=user
     )
 
+@userRouter.get("/{user_id}/accounts")
+def get_user_acc(user_id: str):
+    acc = getUserAcc(user_id)
+
+    if not acc:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "User has no account"}
+        )
+
+    return JSONResponse(
+        status_code=200,
+        content=acc
+    )
+
 @userRouter.post("/")
 def create_user(user: User):
     new_user = createUser(
@@ -39,7 +53,7 @@ def create_user(user: User):
     )
 
     return JSONResponse(
-        status_code=201,
+        status_code=200,
         content={
             "acknowledged": new_user.acknowledged,
             "insertedId": str(new_user.inserted_id)
