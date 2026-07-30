@@ -1,4 +1,5 @@
 import "./About.css";
+import Display_Card from "../display_card/Display_Card";
 
 function About() {
    return (
@@ -20,15 +21,12 @@ function About() {
             </div>
 
             <div className="hero-card">
-               <div className="card">
-                  <h3>Our Mission</h3>
-                  <h1>Customer-focused banking</h1>
-                  <div className="divider"></div>
+               <Display_Card title="Our Mission" headline="Customer-focused banking">
                   <p>
                      Delivering secure and intuitive banking services to help individuals
                      and families achieve their financial goals.
                   </p>
-               </div>
+               </Display_Card>
             </div>
          </main>
       </div>

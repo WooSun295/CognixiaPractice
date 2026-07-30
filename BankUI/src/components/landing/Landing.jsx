@@ -1,4 +1,5 @@
 import "./Landing.css";
+import Display_Card from "../display_card/Display_Card";
 
 function Landing() {
    return (
@@ -19,13 +20,7 @@ function Landing() {
             </div>
 
             <div className="hero-card">
-               <div className="card">
-                  <h3>Total Balance</h3>
-
-                  <h1>$24,685.40</h1>
-
-                  <div className="divider"></div>
-
+               <Display_Card title="Total Balance" headline="$24,685.40">
                   <div className="card-row">
                      <span>Checking</span>
                      <span>$8,250.15</span>
@@ -35,7 +30,7 @@ function Landing() {
                      <span>Savings</span>
                      <span>$16,435.25</span>
                   </div>
-               </div>
+               </Display_Card>
             </div>
          </main>
       </div>

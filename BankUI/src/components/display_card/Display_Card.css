@@ -1,0 +1,43 @@
+.card {
+   width: 360px;
+   background: white;
+   border-radius: 20px;
+   padding: 35px;
+   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.card h3 {
+   color: #666;
+   margin-bottom: 15px;
+}
+
+.card h1 {
+   color: #1f4e79;
+   margin-bottom: 30px;
+}
+
+.divider {
+   width: 100%;
+   height: 1px;
+   background: #ddd;
+   margin-bottom: 20px;
+}
+
+.card-row {
+   display: flex;
+   justify-content: space-between;
+   margin: 18px 0;
+   font-size: 1rem;
+   color: #444;
+}
+
+.card-body {
+   color: #444;
+}
+
+/* helper for listing multiple cards in a column */
+.card-list {
+   display: flex;
+   flex-direction: column;
+   gap: 18px;
+}
