@@ -1,6 +1,8 @@
 from bson import ObjectId
-from helpers.helper import currTime
 from database.database import client
+
+from helpers.helper import currTime
+from auth.password import hashPassword
 
 db = client["simple_bank_db"]
 
@@ -54,26 +56,28 @@ def getUserAccDB(userId: str):
 
     return res
 
-def createUserDB(name: str, password: str, email: str, status: str):
-    exists = usersCol.find_one({
+def createUserDB(name: str, password: str, email: str, status: str, auth: str):
+    exists = usersCol.find_one({ "email": email })
 
-    })
+    if exists:
+        return 409
+
     return usersCol.insert_one({
         "name": name,
         "email": email,
-        "password": password,
+        "password": hashPassword(password),
         "status": status,
-        "auth": "customer",
+        "auth": auth,
         "createdAt": currTime()
 
     })
 
-def updateUserDB(userId: str, name: str, password: str, email: str, status: str):
+def updateUserDB(userId: str, name: str, password: str, email: str, status: str, auth: str):
     if not ObjectId.is_valid(userId):
         return False
     return usersCol.update_one(
         {"_id": ObjectId(userId)},
-        { "$set": {"name": name, "password": password, "email": email, "status": status}}
+        { "$set": {"name": name, "password": hashPassword(password), "email": email, "status": status, "auth": auth}}
     )
 
 def deleteUserDB(userId: str):
