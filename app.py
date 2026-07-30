@@ -5,6 +5,7 @@ from api.account_routes import accountRouter
 
 app = FastAPI()
 
-app.include_router(userRouter)
-app.include_router(accountRouter)
-app.include_router(txnRouter)
+api_prefix = "/api/v3"
+app.include_router(userRouter, prefix=f"{api_prefix}/users")
+app.include_router(accountRouter, prefix=f"{api_prefix}/accounts")
+app.include_router(txnRouter, prefix=f"{api_prefix}/transactions")

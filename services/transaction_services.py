@@ -1,45 +1,35 @@
-from api.dummy_data import MOCK_TXNS
-from helpers.helper import created_at
+from bson import ObjectId
+from helpers.helper import currTime
+from database.database import client
 
-def getTxns():
-    return MOCK_BANKS
+db = client["simple_bank_db"]
 
-def getTxn(txn_id: int):
-    for txn in MOCK_BANKS:
-        if txn["id"] == txn_id:
-            return txn
-    return None
+txnCol = db["Transactions"]
 
-def createTxn(account_id: int, txn_type: str, amount: float):
-    new_txn = {
-        "account_id": account_id,
-        "txn_type": txn_type,
+def getTxnsDB():
+    res = list(txnCol.find())
+    for r in res:
+        r["_id"] = str(r["_id"])
+        r["accountId"] = str(r["accountId"])
+
+    return res
+
+def getTxnDB(txnId: str):
+    if not ObjectId.is_valid(txnId):
+        return False
+    res = txnCol.find_one({"_id": ObjectId(txnId)})
+    if res:
+        res["_id"] = str(res["_id"])
+        res["accountId"] = str(res["accountId"])
+
+    return res
+
+def createTxnDB(accountId: str, txnType: str, amount: float, balanceAfter: float, description: str):
+    return txnCol.insert_one({
+        "accountId": ObjectId(accountId),
+        "txnType": txnType,
         "amount": amount,
-        "createdAt": created_at()
-    }
-
-    MOCK_BANKS.append(new_txn)
-
-    return new_txn
-
-def updateBank(txn_id: int, account_id: int, txn_type: str, amount: float):
-    txn = getTxn(txn_id)
-
-    if txn is None:
-        return None
-
-    txn["account_id"] = account_id
-    txn["txn_type"] = txn_type
-    txn["amount"] = amount
-
-    return txn
-
-def deleteBank(txn_id: int):
-    txn = getTxn(txn_id)
-
-    if txn is None:
-        return None
-
-    MOCK_BANKS.remove(txn)
-
-    return True
+        "balanceAfter": balanceAfter,
+        "description": description,
+        "createdAt": currTime()
+    })

@@ -2,23 +2,24 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from services.user_services import *
+from services.account_services import deleteAccountsDB
 from models.user import User
 
-userRouter = APIRouter(prefix="/api/v2/users", tags=["Users"])
+userRouter = APIRouter(tags=["Users"])
 
 @userRouter.get("/")
-def get_users():
+def get_all_users():
 
-    users = getUsers()
+    users = getUsersDB()
 
     return JSONResponse(
         status_code=200,
         content=users
     )
 
-@userRouter.get("/{user_id}")
-def get_user(user_id: str):
-    user = getUser(user_id)
+@userRouter.get("/{userId}")
+def get_user(userId: str):
+    user = getUserDB(userId)
 
     if not user:
         return JSONResponse(
@@ -31,14 +32,14 @@ def get_user(user_id: str):
         content=user
     )
 
-@userRouter.get("/{user_id}/accounts")
-def get_user_acc(user_id: str):
-    acc = getUserAcc(user_id)
+@userRouter.get("/{userId}/accounts")
+def get_user_accounts(userId: str):
+    acc = getUserAccDB(userId)
 
     if not acc:
         return JSONResponse(
             status_code=404,
-            content={"message": "User has no account"}
+            content={"message": "User not found"}
         )
 
     return JSONResponse(
@@ -48,25 +49,31 @@ def get_user_acc(user_id: str):
 
 @userRouter.post("/")
 def create_user(user: User):
-    new_user = createUser(
-        user.name, user.password, user.email
+    newUser = createUserDB(
+        user.name, user.password, user.email, user.status
     )
 
-    return JSONResponse(
-        status_code=200,
-        content={
-            "acknowledged": new_user.acknowledged,
-            "insertedId": str(new_user.inserted_id)
-        }
+    if newUser.acknowledged:
+        return JSONResponse(
+            status_code=200,
+            content={
+                "acknowledged": newUser.acknowledged,
+                "insertedId": str(newUser.inserted_id)
+            }
+        )
+    else:
+        return JSONResponse(
+            status_code=500,
+            content={"message": "Server Error"}
+        )
+
+@userRouter.put("/{userId}")
+def update_user(userId: str, user: User):
+    updated = updateUserDB(
+        userId, user.name, user.password, user.email, user.status
     )
 
-@userRouter.put("/{user_id}")
-def update_user(user_id: str, user: User):
-    updated = updateUser(
-        user_id, user.name, user.password, user.email
-    )
-
-    if updated.matched_count == 0:
+    if not updated or updated.matched_count == 0:
         return JSONResponse(
             status_code=404,
             content={"message": "User not found"}
@@ -75,15 +82,16 @@ def update_user(user_id: str, user: User):
         status_code=200,
         content={
             "acknowledged": updated.acknowledged,
-            "updatedId": user_id,
+            "updatedId": userId,
         }
     )
 
-@userRouter.delete("/{user_id}")
-def delete_user(user_id: str):
-    deleted = deleteUser(user_id)
+@userRouter.post("/{userId}/deactivate")
+def deactivate_user(userId: str):
+    inactive = deleteUserDB(userId)
+    closed = deleteAccountsDB(userId)
 
-    if deleted.deleted_count == 0:
+    if not inactive or inactive.matched_count == 0:
         return JSONResponse(
             status_code=404,
             content={"message": "User not found"}
@@ -91,7 +99,7 @@ def delete_user(user_id: str):
     return JSONResponse(
         status_code=200,
         content={
-            "acknowledged": deleted.acknowledged,
-            "deleted_count": deleted.deleted_count
+            "acknowledged": "User has been deleted",
+            "accountsClosed": closed.modified_count 
         }
     )

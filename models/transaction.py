@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 class Transaction(BaseModel):
-    account_id: str
-    txn_type: str
+    txnType: str
     amount: float
+    description: str
+    toAccountId: str

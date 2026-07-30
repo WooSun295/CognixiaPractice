@@ -1,30 +1,34 @@
 from bson import ObjectId
-from helpers.helper import created_at
+from helpers.helper import currTime
 from database.database import client
 
 db = client["simple_bank_db"]
 
-users_col = db["Users"]
+usersCol = db["Users"]
 
-def getUsers():
-    res = list(users_col.find())
+def getUsersDB():
+    res = list(usersCol.find())
     for r in res:
         r["_id"] = str(r["_id"])
 
     return res
 
-def getUser(user_id: str):
-    res = users_col.find_one({"_id": ObjectId(user_id)})
+def getUserDB(userId: str):
+    if not ObjectId.is_valid(userId):
+        return False
+    res = usersCol.find_one({"_id": ObjectId(userId)})
     if res:
         res["_id"] = str(res["_id"])
 
     return res
 
-def getUserAcc(user_id: str):
-    res = next(users_col.aggregate([
+def getUserAccDB(userId: str):
+    if not ObjectId.is_valid(userId):
+        return False
+    res = next(usersCol.aggregate([
         {
             "$match": {
-                "_id": ObjectId(user_id)
+                "_id": ObjectId(userId)
             },
         },
         {
@@ -50,19 +54,32 @@ def getUserAcc(user_id: str):
 
     return res
 
-def createUser(name: str, password: str, email: str):
-    return users_col.insert_one({
+def createUserDB(name: str, password: str, email: str, status: str):
+    exists = usersCol.find_one({
+
+    })
+    return usersCol.insert_one({
         "name": name,
-        "password": password,
         "email": email,
-        "createdAt": created_at()
+        "password": password,
+        "status": status,
+        "auth": "customer",
+        "createdAt": currTime()
+
     })
 
-def updateUser(user_id: str, name: str, password: str, email: str):
-    return users_col.update_one(
-        {"_id": ObjectId(user_id)},
-        { "$set": {"name": name, "password": password, "email": email}}
+def updateUserDB(userId: str, name: str, password: str, email: str, status: str):
+    if not ObjectId.is_valid(userId):
+        return False
+    return usersCol.update_one(
+        {"_id": ObjectId(userId)},
+        { "$set": {"name": name, "password": password, "email": email, "status": status}}
     )
 
-def deleteUser(user_id: str):
-    return users_col.delete_one({"_id": ObjectId(user_id)})
+def deleteUserDB(userId: str):
+    if not ObjectId.is_valid(userId):
+        return False
+    return usersCol.update_one(
+        {"_id": ObjectId(userId)},
+        {"$set": {"status": "inactive", "deletedAt": currTime()}}
+    )
