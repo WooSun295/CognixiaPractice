@@ -7,7 +7,12 @@ from pymongo.errors import ServerSelectionTimeoutError
 
 load_dotenv()
 
-client = MongoClient(os.getenv("MONGO_URI"), server_api=ServerApi('1'), serverSelectionTimeoutMS="5000")
+MONGO_URI = os.getenv("MONGO_URI")
+
+if not MONGO_URI:
+    raise RuntimeError("Mongo URI environment variable is not set")
+
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'), serverSelectionTimeoutMS=5000)
 
 try:
     client.admin.command("ping")
