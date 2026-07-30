@@ -1,0 +1,11 @@
+@import "../landing/Landing.css";
+
+/* Page-specific tweaks for About (override landing styles here if needed) */
+
+.hero-content h1 {
+  /* keep heading consistent but allow overrides */
+}
+
+.card p {
+  color: #444; /* ensure readable body copy */
+}

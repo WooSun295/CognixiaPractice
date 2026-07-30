@@ -1,0 +1,11 @@
+@import "../landing/Landing.css";
+
+/* Page-specific tweaks for Features (override landing styles here if needed) */
+
+.hero-content h1 {
+  /* keep heading consistent but allow overrides */
+}
+
+.hero-card .card h3 {
+  font-weight: 600;
+}
