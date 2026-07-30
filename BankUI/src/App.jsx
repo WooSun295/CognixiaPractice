@@ -5,8 +5,8 @@ import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 
 import Landing from "./components/landing/Landing";
-import Features from "./components/Features";
-import About from "./components/About";
+import Features from "./components/features/Features";
+import About from "./components/about/About";
 
 function App() {
    const [path, setPath] = useState(window.location.pathname);
