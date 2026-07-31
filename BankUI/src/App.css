@@ -662,6 +662,7 @@ a:focus-visible {
    background: #fff;
    box-shadow: 0 20px 50px rgba(34, 50, 77, 0.25);
    text-align: center;
+   position: relative;
 }
 
 .modal-card h2 {
@@ -680,9 +681,15 @@ a:focus-visible {
    gap: 12px;
 }
 
+.admin-console-hero {
+   align-items: flex-start;
+   padding: 32px 2%;
+}
+
 .admin-controller {
-   width: min(100%, 760px);
-   padding: 40px;
+   width: min(100%, 1300px);
+   margin: 0 auto;
+   padding: 24px;
    border-radius: 16px;
    background: #fff;
    box-shadow: 0 16px 40px rgba(34, 50, 77, 0.16);
@@ -724,6 +731,186 @@ a:focus-visible {
 
 .admin-tab-panel {
    color: #555;
+}
+
+.admin-table-wrapper {
+   overflow-x: auto;
+   text-align: left;
+}
+
+.admin-table {
+   width: 100%;
+   border-collapse: collapse;
+   font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+   padding: 8px 10px;
+   border-bottom: 1px solid #e7edf7;
+   white-space: nowrap;
+   text-align: left;
+}
+
+.admin-table th {
+   color: #1f4e79;
+   font-weight: 600;
+   text-transform: capitalize;
+}
+
+.admin-table tbody tr:hover {
+   background: #f5f7fb;
+}
+
+.admin-inline-input {
+   width: 100%;
+   min-width: 120px;
+   padding: 6px 8px;
+   border: 1px solid #b8c4d6;
+   border-radius: 6px;
+   background: #fff;
+   color: #22324d;
+   font-size: 0.9rem;
+}
+
+.admin-row-actions {
+   display: flex;
+   gap: 8px;
+   white-space: nowrap;
+}
+
+.admin-icon-btn {
+   display: inline-flex;
+   width: 32px;
+   height: 32px;
+   align-items: center;
+   justify-content: center;
+   border: 1px solid #b8c4d6;
+   border-radius: 6px;
+   background: #fff;
+   color: #1f4e79;
+   font-size: 1rem;
+   line-height: 1;
+   transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.admin-icon-btn:hover {
+   background: #1f4e79;
+   color: #fff;
+   border-color: #1f4e79;
+}
+
+.admin-icon-btn:disabled {
+   cursor: not-allowed;
+   opacity: 0.45;
+}
+
+.admin-icon-btn:disabled:hover {
+   background: #fff;
+   color: #1f4e79;
+   border-color: #b8c4d6;
+}
+
+.admin-icon-btn-deactivate {
+   border-color: #b3261e;
+   color: #b3261e;
+}
+
+.admin-icon-btn-deactivate:hover {
+   background: #b3261e;
+   color: #fff;
+   border-color: #b3261e;
+}
+
+.admin-icon-btn-submit {
+   border-color: #087443;
+   color: #087443;
+}
+
+.admin-icon-btn-submit:hover {
+   background: #087443;
+   color: #fff;
+   border-color: #087443;
+}
+
+.admin-icon-btn-cancel {
+   border-color: #667085;
+   color: #667085;
+}
+
+.admin-icon-btn-cancel:hover {
+   background: #667085;
+   color: #fff;
+   border-color: #667085;
+}
+
+.admin-table-toolbar {
+   display: flex;
+   justify-content: flex-end;
+   margin-bottom: 12px;
+}
+
+.admin-icon-btn-create {
+   border-color: #087443;
+   color: #087443;
+   font-size: 1.25rem;
+}
+
+.admin-icon-btn-create:hover {
+   background: #087443;
+   color: #fff;
+   border-color: #087443;
+}
+
+.modal-close-btn {
+   position: absolute;
+   top: 12px;
+   right: 12px;
+   width: 28px;
+   height: 28px;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   border: none;
+   background: transparent;
+   color: #667085;
+   font-size: 1rem;
+   cursor: pointer;
+   border-radius: 6px;
+}
+
+.modal-close-btn:hover {
+   background: #eef1f6;
+   color: #1f4e79;
+}
+
+.confirm-modal-details {
+   display: grid;
+   gap: 8px;
+   margin: 0 0 24px;
+   padding: 16px;
+   border-radius: 10px;
+   background: #f5f7fb;
+   text-align: left;
+}
+
+.confirm-modal-detail-row {
+   display: flex;
+   justify-content: space-between;
+   gap: 12px;
+   font-size: 0.9rem;
+}
+
+.confirm-modal-detail-label {
+   color: #667085;
+   font-weight: 600;
+}
+
+.confirm-modal-detail-value {
+   color: #22324d;
+   font-weight: 500;
+   text-align: right;
+   word-break: break-word;
 }
 
 .site-footer {

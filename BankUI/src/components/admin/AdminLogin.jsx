@@ -5,10 +5,9 @@ import Form from "../form/Form";
 import AdminController from "./AdminController";
 
 function AdminLogin() {
-   const { setToken } = useAuth();
+   const { token, setToken } = useAuth();
    const [error, setError] = useState("");
    const [isSubmitting, setIsSubmitting] = useState(false);
-   const [loggedIn, setLoggedIn] = useState(false);
 
    const handleSubmit = async (values) => {
       setError("");
@@ -25,7 +24,6 @@ function AdminLogin() {
          }
 
          setToken(response.access_token);
-         setLoggedIn(true);
       } catch (requestError) {
          setError(requestError instanceof Error ? requestError.message : "Unable to complete the request.");
       } finally {
@@ -33,10 +31,12 @@ function AdminLogin() {
       }
    };
 
-   if (loggedIn) {
+   // The token is persisted in localStorage (see AuthProvider), so as long as
+   // it exists and hasn't expired, the admin stays signed in across reloads.
+   if (token) {
       return (
          <div className="landing-page admin-login-page">
-            <main className="hero auth-hero">
+            <main className="hero admin-console-hero">
                <AdminController />
             </main>
          </div>

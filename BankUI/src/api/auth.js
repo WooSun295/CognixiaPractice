@@ -1,6 +1,6 @@
 import { decodeJwtPayload, isTokenExpired } from "../utils/jwt";
 
-const API_BASE_URL = "https://4e28fjb9t8.execute-api.us-east-1.amazonaws.com/api/v4";
+const API_BASE_URL = "https://uxdrf2vote.execute-api.us-east-1.amazonaws.com/api/v5";
 
 export class TokenExpiredError extends Error {
    constructor() {
@@ -256,4 +256,164 @@ export function registerUser({ name, email, password }) {
 
 export function loginUser({ email, password }) {
    return requestAuth("/auth/login", { email, password });
+}
+
+async function requestAdmin(token, path) {
+   assertTokenNotExpired(token);
+   const response = await fetch(`${API_BASE_URL}${path}`, {
+      headers: {
+         Authorization: `Bearer ${token}`,
+      },
+   });
+   const data = await parseResponse(response);
+
+   if (!response.ok) {
+      const message =
+         typeof data === "object" && data?.detail
+            ? data.detail
+            : typeof data === "object" && data?.message
+              ? data.message
+              : typeof data === "string" && data
+                ? data
+                : `Request failed with status ${response.status}.`;
+      throw new Error(message);
+   }
+
+   return data;
+}
+
+export async function getAllUsers(token) {
+   const data = await requestAdmin(token, "/admin/users");
+   if (Array.isArray(data)) return data;
+   if (data && Array.isArray(data.users)) return data.users;
+   return [];
+}
+
+export async function getAllAccounts(token) {
+   const data = await requestAdmin(token, "/accounts/");
+   if (Array.isArray(data)) return data;
+   if (data && Array.isArray(data.accounts)) return data.accounts;
+   return [];
+}
+
+export async function getAllTransactions(token) {
+   const data = await requestAdmin(token, "/transactions/");
+   if (Array.isArray(data)) return data;
+   if (data && Array.isArray(data.transactions)) return data.transactions;
+   return [];
+}
+
+export async function updateUserByAdmin(token, userId, { name, email, status, auth }) {
+   assertTokenNotExpired(token);
+   const response = await fetch(
+      `${API_BASE_URL}/admin/users/${encodeURIComponent(userId)}`,
+      {
+         method: "PUT",
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+         },
+         body: JSON.stringify({ name, password: "", email, status, auth }),
+      },
+   );
+   const data = await parseResponse(response);
+
+   if (!response.ok) {
+      const message =
+         typeof data === "object" && data?.detail
+            ? data.detail
+            : typeof data === "object" && data?.message
+              ? data.message
+              : typeof data === "string" && data
+                ? data
+                : `Request failed with status ${response.status}.`;
+      throw new Error(message);
+   }
+
+   return data;
+}
+
+export async function deactivateUserByAdmin(token, userId) {
+   assertTokenNotExpired(token);
+   const response = await fetch(
+      `${API_BASE_URL}/admin/users/${encodeURIComponent(userId)}deactivate`,
+      {
+         method: "POST",
+         headers: {
+            Authorization: `Bearer ${token}`,
+         },
+      },
+   );
+   const data = await parseResponse(response);
+
+   if (!response.ok) {
+      const message =
+         typeof data === "object" && data?.detail
+            ? data.detail
+            : typeof data === "object" && data?.message
+              ? data.message
+              : typeof data === "string" && data
+                ? data
+                : `Request failed with status ${response.status}.`;
+      throw new Error(message);
+   }
+
+   return data;
+}
+
+export async function createUserByAdmin(token, { name, password, email, status, auth }) {
+   assertTokenNotExpired(token);
+   const response = await fetch(`${API_BASE_URL}/admin/users`, {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json",
+         Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name, password, email, status, auth }),
+   });
+   const data = await parseResponse(response);
+
+   if (!response.ok) {
+      const message =
+         typeof data === "object" && data?.detail
+            ? data.detail
+            : typeof data === "object" && data?.message
+              ? data.message
+              : typeof data === "string" && data
+                ? data
+                : `Request failed with status ${response.status}.`;
+      throw new Error(message);
+   }
+
+   return data;
+}
+
+export async function updateAccountByAdmin(token, accountId, { balance, accountType, status }) {
+   assertTokenNotExpired(token);
+   const response = await fetch(
+      `${API_BASE_URL}/accounts/${encodeURIComponent(accountId)}`,
+      {
+         method: "PUT",
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+         },
+         body: JSON.stringify({ balance, accountType, status }),
+      },
+   );
+   const data = await parseResponse(response);
+
+   if (!response.ok) {
+      const message =
+         typeof data === "object" && data?.detail
+            ? data.detail
+            : typeof data === "object" && data?.message
+              ? data.message
+              : typeof data === "string" && data
+                ? data
+                : `Request failed with status ${response.status}.`;
+      throw new Error(message);
+   }
+
+   return data;
 }
