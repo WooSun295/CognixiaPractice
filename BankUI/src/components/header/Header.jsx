@@ -27,9 +27,14 @@ function Header({ navigate }) {
          </a>
 
          <div className="nav-links">
-            <a href="/features" onClick={(e) => go(e, "/features")}>Features</a>
-            <a href="/about" onClick={(e) => go(e, "/about")}>About</a>
+            {!token && (
+               <>
+                  <a href="/features" onClick={(e) => go(e, "/features")}>Features</a>
+                  <a href="/about" onClick={(e) => go(e, "/about")}>About</a>
+               </>
+            )}
             {token && <a href="/accounts" onClick={(e) => go(e, "/accounts")}>Accounts</a>}
+            {token && <a href="/profile" onClick={(e) => go(e, "/profile")}>Profile</a>}
             <button className="login-btn" onClick={handleAuthAction}>
                {token ? "Logout" : "Login"}
             </button>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createAccount, getUserAccounts } from "../../api/auth";
+import { createAccount, getUserAccounts, TokenExpiredError } from "../../api/auth";
 import { useAuth } from "../../context/useAuth";
 import Form from "../form/Form";
 
@@ -7,7 +7,19 @@ function accountLabel(account) {
    return account.accountType + " Account";
 }
 
-function Accounts({ navigate }) {
+function accountTypeOrder(account) {
+   const type = (
+      account.accountType ||
+      account.account_type ||
+      account.type ||
+      ""
+   ).toLowerCase();
+   if (type.includes("checking")) return 0;
+   if (type.includes("saving")) return 1;
+   return 2;
+}
+
+function Accounts({ navigate, onUserLoaded }) {
    const { token, clearToken } = useAuth();
    const [userData, setUserData] = useState(null);
    const [error, setError] = useState("");
@@ -28,10 +40,18 @@ function Accounts({ navigate }) {
 
       getUserAccounts(token)
          .then((data) => {
-            if (isMounted) setUserData(data);
+            if (isMounted) {
+               setUserData(data);
+               onUserLoaded?.(data);
+            }
          })
          .catch((requestError) => {
             if (!isMounted) return;
+            if (requestError instanceof TokenExpiredError) {
+               clearToken();
+               navigate("/");
+               return;
+            }
             if (requestError.message.includes("401")) {
                clearToken();
                navigate("/login");
@@ -50,7 +70,7 @@ function Accounts({ navigate }) {
       return () => {
          isMounted = false;
       };
-   }, [clearToken, navigate, token]);
+   }, [clearToken, navigate, token, onUserLoaded]);
 
    useEffect(() => {
       if (!creationSuccess) return undefined;
@@ -59,8 +79,14 @@ function Accounts({ navigate }) {
          try {
             const refreshedUserData = await getUserAccounts(token);
             setUserData(refreshedUserData);
+            onUserLoaded?.(refreshedUserData);
             setCreationSuccess(false);
          } catch (requestError) {
+            if (requestError instanceof TokenExpiredError) {
+               clearToken();
+               navigate("/");
+               return;
+            }
             setCreationSuccess(false);
             setError(
                requestError instanceof Error
@@ -71,7 +97,7 @@ function Accounts({ navigate }) {
       }, 3000);
 
       return () => window.clearTimeout(timeoutId);
-   }, [creationSuccess, token]);
+   }, [creationSuccess, token, clearToken, navigate, onUserLoaded]);
 
    const showCreationForm = (nextAccountType) => {
       setError("");
@@ -87,6 +113,11 @@ function Accounts({ navigate }) {
          setAccountType(null);
          setCreationSuccess(true);
       } catch (requestError) {
+         if (requestError instanceof TokenExpiredError) {
+            clearToken();
+            navigate("/");
+            return;
+         }
          setError(
             requestError instanceof Error
                ? requestError.message
@@ -128,7 +159,9 @@ function Accounts({ navigate }) {
 
    const accounts = userData?.accounts || [];
    const sortedAccounts = [...accounts].sort((left, right) => {
-      return Number(left.status === "closed") - Number(right.status === "closed");
+      const closedDiff = Number(left.status === "closed") - Number(right.status === "closed");
+      if (closedDiff !== 0) return closedDiff;
+      return accountTypeOrder(left) - accountTypeOrder(right);
    });
 
    return (

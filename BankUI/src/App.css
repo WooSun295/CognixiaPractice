@@ -248,6 +248,36 @@ a:focus-visible {
    max-width: 1000px;
 }
 
+.back-to-accounts {
+   display: inline-block;
+   margin: 0 auto 20px;
+   max-width: 1000px;
+   width: 100%;
+   color: #1f4e79;
+   text-decoration: none;
+   font-weight: 600;
+}
+
+.back-to-accounts:hover {
+   color: #173c5d;
+}
+
+.profile-page-header {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 24px;
+   margin: 0 auto 20px;
+   max-width: 1000px;
+   width: 100%;
+}
+
+.profile-page-header .back-to-accounts {
+   margin: 0;
+   max-width: none;
+   width: auto;
+}
+
 .accounts-header h1,
 .account-options h2,
 .account-card h2 {
@@ -454,7 +484,7 @@ a:focus-visible {
 .account-creation .auth-form {
    width: min(100%, 280px);
    align-items: center;
-   margin: 0 auto 8px;
+   margin: 0 auto 20px;
 }
 
 .account-creation .auth-form .primary-btn {
@@ -560,8 +590,57 @@ a:focus-visible {
    font-size: 1rem;
 }
 
+.account-info-card .auth-form {
+   width: min(100%, 360px);
+   align-items: center;
+   margin: 0 auto 20px;
+}
+
+.account-info-card .auth-field {
+   align-items: center;
+   text-align: center;
+}
+
+.delete-user-btn {
+   flex-shrink: 0;
+   padding: 8px 18px;
+   border: 2px solid #b3261e;
+   border-radius: 6px;
+   background: transparent;
+   color: #b3261e;
+   font-weight: 600;
+   cursor: pointer;
+}
+
+.delete-user-btn:hover {
+   background: #b3261e;
+   color: #fff;
+}
+
+.delete-user-btn:disabled {
+   opacity: 0.6;
+   cursor: not-allowed;
+}
+
+
 .transaction-form-card {
    margin: 0 auto 20px;
+   text-align: center;
+}
+
+.transaction-form-card p {
+   margin-bottom: 20px;
+}
+
+.transaction-form-card .auth-form {
+   width: min(100%, 360px);
+   align-items: center;
+   margin: 0 auto 20px;
+   gap: 16px;
+}
+
+.transaction-form-card .auth-field {
+   align-items: center;
    text-align: center;
 }
 

@@ -1,6 +1,9 @@
 import Display_Card from "../display_card/Display_Card";
+import { useAuth } from "../../context/useAuth";
 
 function Landing({ navigate }) {
+   const { token } = useAuth();
+
    return (
       <div className="landing-page">
          <main className="hero">
@@ -13,12 +16,20 @@ function Landing({ navigate }) {
                </p>
 
                <div className="hero-buttons">
-                  <button className="primary-btn" onClick={() => navigate("/login")}>
-                     Get Started
-                  </button>
-                  <button className="secondary-btn" onClick={() => navigate("/features")}>
-                     Learn More
-                  </button>
+                  {token ? (
+                     <button className="primary-btn" onClick={() => navigate("/accounts")}>
+                        Go to Accounts
+                     </button>
+                  ) : (
+                     <>
+                        <button className="primary-btn" onClick={() => navigate("/login")}>
+                           Get Started
+                        </button>
+                        <button className="secondary-btn" onClick={() => navigate("/features")}>
+                           Learn More
+                        </button>
+                     </>
+                  )}
                </div>
             </div>
 

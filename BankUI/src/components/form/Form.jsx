@@ -43,6 +43,8 @@ function Form({
                            name={name}
                            defaultValue={field.defaultValue}
                            placeholder={field.placeholder}
+                           step={field.step}
+                           min={field.min}
                            required={field.required !== false}
                         />
                      )}
