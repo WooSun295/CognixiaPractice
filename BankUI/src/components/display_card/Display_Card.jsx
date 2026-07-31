@@ -1,6 +1,4 @@
 ﻿import React from "react";
-import "./Display_Card.css";
-
 function Display_Card({ title, headline, children }) {
    return (
       <div className="card">
@@ -14,4 +12,3 @@ function Display_Card({ title, headline, children }) {
 }
 
 export default Display_Card;
-

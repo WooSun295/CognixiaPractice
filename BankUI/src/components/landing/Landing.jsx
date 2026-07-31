@@ -1,7 +1,6 @@
-import "./Landing.css";
 import Display_Card from "../display_card/Display_Card";
 
-function Landing() {
+function Landing({ navigate }) {
    return (
       <div className="landing-page">
          <main className="hero">
@@ -14,8 +13,12 @@ function Landing() {
                </p>
 
                <div className="hero-buttons">
-                  <button className="primary-btn">Get Started</button>
-                  <button className="secondary-btn">Learn More</button>
+                  <button className="primary-btn" onClick={() => navigate("/login")}>
+                     Get Started
+                  </button>
+                  <button className="secondary-btn" onClick={() => navigate("/features")}>
+                     Learn More
+                  </button>
                </div>
             </div>
 

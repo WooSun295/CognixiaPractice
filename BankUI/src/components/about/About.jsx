@@ -1,7 +1,10 @@
-import "./About.css";
 import Display_Card from "../display_card/Display_Card";
+import ContactModal from "../modal/ContactModal";
+import { useState } from "react";
 
 function About() {
+   const [showContact, setShowContact] = useState(false);
+
    return (
       <div className="landing-page">
          <main className="hero">
@@ -16,7 +19,7 @@ function About() {
                </p>
 
                <div className="hero-buttons">
-                  <button className="primary-btn">Contact Us</button>
+                  <button className="primary-btn" onClick={() => setShowContact(true)}>Contact Us</button>
                </div>
             </div>
 
@@ -29,6 +32,7 @@ function About() {
                </Display_Card>
             </div>
          </main>
+         {showContact && <ContactModal onClose={() => setShowContact(false)} />}
       </div>
    );
 }
