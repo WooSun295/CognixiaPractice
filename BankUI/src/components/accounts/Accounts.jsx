@@ -94,7 +94,7 @@ function Accounts({ navigate, onUserLoaded }) {
                   : "Unable to load accounts.",
             );
          }
-      }, 3000);
+      }, 1000);
 
       return () => window.clearTimeout(timeoutId);
    }, [creationSuccess, token, clearToken, navigate, onUserLoaded]);
@@ -159,7 +159,8 @@ function Accounts({ navigate, onUserLoaded }) {
 
    const accounts = userData?.accounts || [];
    const sortedAccounts = [...accounts].sort((left, right) => {
-      const closedDiff = Number(left.status === "closed") - Number(right.status === "closed");
+      const closedDiff =
+         Number(left.status === "closed") - Number(right.status === "closed");
       if (closedDiff !== 0) return closedDiff;
       return accountTypeOrder(left) - accountTypeOrder(right);
    });
@@ -202,18 +203,18 @@ function Accounts({ navigate, onUserLoaded }) {
                {sortedAccounts.map((account) => {
                   const isClosed = account.status === "closed";
                   return (
-                  <button
-                     className={`account-card${isClosed ? " account-card-closed" : ""}`}
-                     type="button"
-                     key={account._id}
-                     disabled={isClosed}
-                     onClick={() => navigate(`/accounts/${account._id}`)}
-                  >
-                     <h2>{accountLabel(account)}</h2>
-                     {account.balance !== undefined && (
-                        <strong>${Number(account.balance).toFixed(2)}</strong>
-                     )}
-                  </button>
+                     <button
+                        className={`account-card${isClosed ? " account-card-closed" : ""}`}
+                        type="button"
+                        key={account._id}
+                        disabled={isClosed}
+                        onClick={() => navigate(`/accounts/${account._id}`)}
+                     >
+                        <h2>{accountLabel(account)}</h2>
+                        {account.balance !== undefined && (
+                           <strong>${Number(account.balance).toFixed(2)}</strong>
+                        )}
+                     </button>
                   );
                })}
             </div>

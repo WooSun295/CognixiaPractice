@@ -63,7 +63,7 @@ function DataTable({ rows, emptyMessage }) {
    );
 }
 
-function AdminController() {
+function AdminController({ onLogout }) {
    const { token, clearToken } = useAuth();
    const [activeTab, setActiveTab] = useState(TABS[0].id);
    const [users, setUsers] = useState([]);
@@ -116,7 +116,18 @@ function AdminController() {
 
    return (
       <div className="admin-controller">
-         <h1>Admin Controller</h1>
+         <div className="admin-controller-heading">
+            <h1>Admin Controller</h1>
+            {onLogout && (
+               <button
+                  type="button"
+                  className="admin-logout-btn"
+                  onClick={onLogout}
+               >
+                  Logout
+               </button>
+            )}
+         </div>
          <div className="admin-tabs" role="tablist">
             {TABS.map((tab) => (
                <button

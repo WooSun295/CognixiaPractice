@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import { loginUser } from "../../api/auth";
 import Form from "../form/Form";
-import AdminController from "./AdminController";
 
-function AdminLogin() {
+const ADMIN_PORTAL_PATH = "/admin/1029384756/portal";
+
+function AdminLogin({ navigate }) {
    const { token, setToken } = useAuth();
    const [error, setError] = useState("");
    const [isSubmitting, setIsSubmitting] = useState(false);
+
+   // If a valid token is already stored, go straight to the portal.
+   useEffect(() => {
+      if (token) {
+         navigate(ADMIN_PORTAL_PATH);
+      }
+   }, [token, navigate]);
 
    const handleSubmit = async (values) => {
       setError("");
@@ -24,24 +32,13 @@ function AdminLogin() {
          }
 
          setToken(response.access_token);
+         // useEffect above will navigate once token is set.
       } catch (requestError) {
          setError(requestError instanceof Error ? requestError.message : "Unable to complete the request.");
       } finally {
          setIsSubmitting(false);
       }
    };
-
-   // The token is persisted in localStorage (see AuthProvider), so as long as
-   // it exists and hasn't expired, the admin stays signed in across reloads.
-   if (token) {
-      return (
-         <div className="landing-page admin-login-page">
-            <main className="hero admin-console-hero">
-               <AdminController />
-            </main>
-         </div>
-      );
-   }
 
    return (
       <div className="landing-page admin-login-page">

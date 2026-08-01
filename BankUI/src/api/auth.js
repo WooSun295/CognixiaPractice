@@ -55,6 +55,7 @@ async function requestAuth(path, payload) {
 export async function getUserAccounts(token) {
    assertTokenNotExpired(token);
    const response = await fetch(`${API_BASE_URL}/users/me/accounts`, {
+      cache: "no-store",
       headers: {
          Authorization: `Bearer ${token}`,
       },
@@ -388,7 +389,11 @@ export async function createUserByAdmin(token, { name, password, email, status, 
    return data;
 }
 
-export async function updateAccountByAdmin(token, accountId, { balance, accountType, status }) {
+export async function updateAccountByAdmin(
+   token,
+   accountId,
+   { balance, accountType, status },
+) {
    assertTokenNotExpired(token);
    const response = await fetch(
       `${API_BASE_URL}/accounts/${encodeURIComponent(accountId)}`,
