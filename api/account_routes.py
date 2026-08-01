@@ -11,12 +11,12 @@ from models.transaction import Transaction
 accountRouter = APIRouter(tags=["Accounts"])
 
 @accountRouter.get("/")
-def get_all_accounts(currentUser=Depends(activeUserRequired)):
+def admin_get_all_accounts(currentUser=Depends(activeUserRequired)):
 
     if not isAdmin(currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     accounts = getAccountsDB()
@@ -34,13 +34,13 @@ def get_account(accountId: str, currentUser=Depends(activeUserRequired)):
     if not account:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"Account not found"}
+            detail="Account not found"
         )
 
     if not isAdminOrOwner(account.userId, currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     return JSONResponse(
@@ -51,25 +51,19 @@ def get_account(accountId: str, currentUser=Depends(activeUserRequired)):
 @accountRouter.post("/")
 def create_account(account: Account, currentUser=Depends(activeUserRequired)):
 
-    if not isAdminOrOwner(account.userId, currentUser):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
-        )
-
     newAccount = createAccountDB(
-        account.userId, account.balance, account.accountType, account.status
+        str(currentUser["_id"]), 0, account.accountType, "open"
     )
 
     if newAccount.acknowledged:
         return JSONResponse(
             status_code=201,
-            content={"Message": "Account Created"}
+            content="Account Created"
         )
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"Database Connection Error"}
+            detail="Database Connection Error"
         )
 
 @accountRouter.get("/{accountId}/transactions")
@@ -78,15 +72,15 @@ def get_account_transaction_history(accountId: str, currentUser=Depends(activeUs
     account = getAccountTxnDB(accountId)
 
     if not account:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Account not found"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Account Not Found"
         )
 
-    if not isAdminOrOwner(account.userId, currentUser):
+    if not isAdminOrOwner(account["userId"], currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     return JSONResponse(
@@ -99,16 +93,16 @@ def account_transactions(accountId: str, txn: Transaction, currentUser=Depends(a
 
     account = getAccountDB(accountId)
 
-    if not isOwner(account.userId, currentUser):
+    if not isOwner(account["userId"], currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     if txn.amount <= 0:
         raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail={"Insufficient Amount"}
+                detail="Insufficient Amount"
             )
     updated = accountTxnDB(
         accountId, txn.txnType, txn.amount, txn.description, txn.toAccountId
@@ -117,19 +111,19 @@ def account_transactions(accountId: str, txn: Transaction, currentUser=Depends(a
     if updated == 404:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"Account not found"}
+            detail="Account not found"
         )
 
     if updated == 403:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Account is closed"}
+            detail="Account is closed"
         )
 
     if updated == 422:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail={"Insufficient Funds"}
+            detail="Insufficient Funds"
         )
 
     if txn.txnType == "transfer":
@@ -152,24 +146,24 @@ def account_transactions(accountId: str, txn: Transaction, currentUser=Depends(a
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"Database Connection Error"}
+            detail="Database Connection Error"
         )
 
 @accountRouter.put("/{accountId}")
-def update_account(accountId: str, account: Account, currentUser=Depends(activeUserRequired)):
+def admin_update_account(accountId: str, account: Account, currentUser=Depends(activeUserRequired)):
 
-    account = getAccountDB(accountId)
+    oldAccount = getAccountDB(accountId)
 
-    if not account:
+    if not oldAccount:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"Account not found"}
+            detail="Account not found"
         )
 
-    if not isAdminOrOwner(account.userId, currentUser):
+    if not isAdmin(currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     updated = updateAccountDB(
@@ -187,7 +181,7 @@ def update_account(accountId: str, account: Account, currentUser=Depends(activeU
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"Database Connection Error"}
+            detail="Database Connection Error"
         )
 
 @accountRouter.post("/{accountId}/close")
@@ -198,13 +192,13 @@ def close_account(accountId: str, currentUser=Depends(activeUserRequired)):
     if not account:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"Account not found"}
+            detail="Account not found"
         )
 
-    if not isAdminOrOwner(account.userId, currentUser):
+    if not isAdminOrOwner(account["userId"], currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     closed = deleteAccountDB(accountId)
@@ -219,5 +213,5 @@ def close_account(accountId: str, currentUser=Depends(activeUserRequired)):
 
     raise HTTPException(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail={"Database Connection Error"}
+        detail="Database Connection Error"
     )

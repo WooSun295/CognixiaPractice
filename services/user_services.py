@@ -12,6 +12,7 @@ def getUsersDB():
     res = list(usersCol.find())
     for r in res:
         r["_id"] = str(r["_id"])
+        r["password"] = "**********"
 
     return res
 
@@ -21,6 +22,7 @@ def getUserDB(userId: str):
     res = usersCol.find_one({"_id": ObjectId(userId)})
     if res:
         res["_id"] = str(res["_id"])
+        r["password"] = "**********"
 
     return res
 
@@ -75,9 +77,16 @@ def createUserDB(name: str, password: str, email: str, status: str, auth: str):
 def updateUserDB(userId: str, name: str, password: str, email: str, status: str, auth: str):
     if not ObjectId.is_valid(userId):
         return False
+    
+    if password != "":
+        return usersCol.update_one(
+            {"_id": ObjectId(userId)},
+            { "$set": {"name": name, "password": hashPassword(password), "email": email, "status": status, "auth": auth}}
+        )
+    
     return usersCol.update_one(
         {"_id": ObjectId(userId)},
-        { "$set": {"name": name, "password": hashPassword(password), "email": email, "status": status, "auth": auth}}
+        { "$set": {"name": name, "email": email, "status": status, "auth": auth}}
     )
 
 def deleteUserDB(userId: str):

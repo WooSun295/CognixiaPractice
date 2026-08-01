@@ -15,7 +15,7 @@ def get_all_transaction_history(currentUser=Depends(activeUserRequired)):
     if not isAdmin(currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     txns = getTxnsDB()
@@ -33,7 +33,7 @@ def get_transaction(txnId: str, currentUser=Depends(activeUserRequired)):
     if not txn:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"Transaction not found"}
+            detail="Transaction not found"
         )
 
     account = getAccountDB(txnId.accountId)
@@ -41,7 +41,7 @@ def get_transaction(txnId: str, currentUser=Depends(activeUserRequired)):
     if not isAdminOrOwner(account.userId, currentUser):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
+            detail="Not Authorized"
         )
 
     return JSONResponse(

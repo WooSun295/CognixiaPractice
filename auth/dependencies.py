@@ -35,7 +35,7 @@ def getCurrentUser(credentials: HTTPAuthorizationCredentials = Depends(security)
 
     user = usersCol.find_one({
         "_id": ObjectId(userId)
-    })
+    }, {"password": 0})
 
     if user is None:
         raise HTTPException(

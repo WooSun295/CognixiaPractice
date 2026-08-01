@@ -29,20 +29,18 @@ def getAccountDB(accountId: str):
 def getAccountTxnDB(accountId: str):
     if not ObjectId.is_valid(accountId):
         return False
-    res = next(accCol.aggregate([
-        {
-            "$match": {
-                "_id": ObjectId(accountId)
-            },
-        },
-        {
-            "$lookup": {
-                "from": "Transactions",
-                "localField": "_id",
-                "foreignField": "accountId",
-                "as": "transactions"
-            }
-        }
+    res = next(accCol.aggregate([ 
+        { 
+            "$match": { "_id": ObjectId(accountId) }, 
+        }, 
+        { 
+            "$lookup": { 
+                "from": "Transactions", 
+                "localField": "_id", 
+                "foreignField": "accountId", 
+                "as": "transactions" 
+            } 
+        }, 
     ]), None)
 
     if res:

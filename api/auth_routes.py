@@ -17,18 +17,18 @@ def register(user: RegisterRequest):
     if newUser == 409:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail={"Duplicate Email"}
+            detail="Duplicate Email"
         )
 
     if newUser.acknowledged:
         return JSONResponse(
             status_code=200,
-            content={"message": "New User Registered"}
+            content="New User Registered"
         )
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"Database Connection Error"}
+            detail="Database Connection Error"
         )
 
 @authRouter.post("/login")
@@ -39,7 +39,7 @@ def login(user: LoginRequest):
     if not token:
         return JSONResponse(
             status_code=401,
-            content={"message": "Invalid email or password"}
+            content="Invalid email or password"
         )
 
     return JSONResponse(

@@ -10,37 +10,15 @@ from models.user import User
 
 userRouter = APIRouter(tags=["Users"])
 
-@userRouter.get("/")
-def get_all_users(currentUser=Depends(activeUserRequired)):
+@userRouter.get("/me")
+def get_user(currentUser=Depends(activeUserRequired)):
 
-    if not isAdmin(currentUser):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
-        )
-
-    users = getUsersDB()
-
-    return JSONResponse(
-        status_code=200,
-        content=users
-    )
-
-@userRouter.get("/{userId}")
-def get_user(userId: str, currentUser=Depends(activeUserRequired)):
-
-    if not isAdminOrOwner(userId, currentUser):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
-        )
-
-    user = getUserDB(userId)
+    user = getUserDB(str(currentUser["_id"]))
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"User not found"}
+            detail="User not found"
         )
 
     return JSONResponse(
@@ -48,21 +26,15 @@ def get_user(userId: str, currentUser=Depends(activeUserRequired)):
         content=user
     )
 
-@userRouter.get("/{userId}/accounts")
-def get_user_accounts(userId: str, currentUser=Depends(activeUserRequired)):
+@userRouter.get("/me/accounts")
+def get_user_accounts(currentUser=Depends(activeUserRequired)):
 
-    if not isAdminOrOwner(userId, currentUser):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
-        )
-
-    acc = getUserAccDB(userId)
+    acc = getUserAccDB(str(currentUser["_id"]))
 
     if not acc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"User not found"}
+            detail="User not found"
         )
 
     return JSONResponse(
@@ -70,56 +42,17 @@ def get_user_accounts(userId: str, currentUser=Depends(activeUserRequired)):
         content=acc
     )
 
-@userRouter.post("/")
-def create_user(user: User, currentUser=Depends(activeUserRequired)):
-
-    if not isAdmin(currentUser):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
-        )
-
-    newUser = createUserDB(
-        user.name, user.password, user.email, user.status, user.auth
-    )
-
-    if newUser == 409:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail={"Duplicate Email"}
-        )
-
-    if newUser.acknowledged:
-        return JSONResponse(
-            status_code=200,
-            content={
-                "acknowledged": newUser.acknowledged,
-                "insertedId": str(newUser.inserted_id)
-            }
-        )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"Database Connection Error"}
-        )
-
-@userRouter.put("/{userId}")
-def update_user(userId: str, user: User, currentUser=Depends(activeUserRequired)):
-
-    if not isAdminOrOwner(userId, currentUser):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
-        )
+@userRouter.put("/me")
+def update_user(user: User, currentUser=Depends(activeUserRequired)):
 
     updated = updateUserDB(
-        userId, user.name, user.password, user.email, user.status, user.auth
+        str(currentUser["_id"]), user.name, user.password, user.email, currentUser["status"], currentUser["auth"]
     )
 
     if not updated or updated.matched_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"User not found"}
+            detail="User not found"
         )
 
     if updated.acknowledged:
@@ -127,32 +60,26 @@ def update_user(userId: str, user: User, currentUser=Depends(activeUserRequired)
             status_code=200,
             content={
                 "acknowledged": updated.acknowledged,
-                "updatedId": userId,
+                "updatedId": str(currentUser["_id"]),
             }
         )
     
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"Database Connection Error"}
+            detail="Database Connection Error"
         )
 
-@userRouter.post("/{userId}/deactivate")
-def deactivate_user(userId: str, currentUser=Depends(activeUserRequired)):
+@userRouter.post("/me/deactivate")
+def deactivate_user(currentUser=Depends(activeUserRequired)):
 
-    if not isAdminOrOwner(userId, currentUser):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"Not Authorized"}
-        )
-
-    inactive = deleteUserDB(userId)
-    closed = deleteAccountsDB(userId)
+    inactive = deleteUserDB(str(currentUser["_id"]))
+    closed = deleteAccountsDB(str(currentUser["_id"]))
 
     if not inactive or inactive.matched_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"User not found"}
+            detail="User not found"
         )
 
     if inactive.acknowledged:
@@ -167,5 +94,5 @@ def deactivate_user(userId: str, currentUser=Depends(activeUserRequired)):
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"Database Connection Error"}
+            detail="Database Connection Error"
         )
